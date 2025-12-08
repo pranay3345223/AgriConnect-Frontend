@@ -1,0 +1,13 @@
+# Tell GitHub to properly detect TypeScript as primary language
+*.html linguist-detectable=false
+*.css linguist-detectable=false
+*.scss linguist-detectable=false
+
+# Mark source-files-reference as vendored (backup files)
+source-files-reference/** linguist-vendored
+
+# Mark node_modules as vendored (should already be in .gitignore)
+node_modules/** linguist-vendored
+
+# Ensure TypeScript is detected
+*.ts linguist-detectable=true
