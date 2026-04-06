@@ -44,7 +44,7 @@ import { Observable } from 'rxjs';
       <div class="machine-grid">
         @for (machine of machines$ | async; track machine.id) {
           <div class="machine-card glass-panel">
-            <div class="card-image" [style.background-image]="'url(' + (machine.imageUrl || 'assets/images/placeholder-machine.jpg') + ')'">
+            <div class="card-image" [style.background-image]="'url(' + getImageUrl(machine.imageUrl) + ')'">
               <div class="price-tag">\${{ machine.pricePerDay }}/day</div>
             </div>
             
@@ -313,5 +313,11 @@ export class MachineListComponent implements OnInit {
         category: this.selectedType || undefined
       });
     }
+  }
+
+  getImageUrl(path?: string): string {
+    if (!path) return 'assets/images/placeholder-machine.jpg';
+    if (path.startsWith('http')) return path;
+    return `http://localhost:8080${path}`;
   }
 }

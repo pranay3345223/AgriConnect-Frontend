@@ -65,10 +65,10 @@ import { Machine } from '../../../models/machine.model';
               <textarea [(ngModel)]="machine.description" name="description" rows="4" required placeholder="Describe features, condition, etc."></textarea>
             </div>
             
-            <!-- Image URL -->
+            <!-- Image Upload -->
              <div class="form-group full-width">
-              <label>Image URL (Optional)</label>
-              <input type="url" [(ngModel)]="machine.imageUrl" name="imageUrl" placeholder="https://example.com/image.jpg">
+              <label>Machine Photo (Optional)</label>
+              <input type="file" (change)="onFileSelected($event)" accept="image/*" class="modern-input">
             </div>
           </div>
 
@@ -199,8 +199,17 @@ export class MachineFormComponent {
     available: true
   };
 
+  selectedFile: File | undefined;
+
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
+
   onSubmit() {
-    this.machineService.createMachine(this.machine).subscribe({
+    this.machineService.createMachine(this.machine, this.selectedFile).subscribe({
       next: () => this.router.navigate(['/machines']),
       error: (err) => console.error(err)
     });

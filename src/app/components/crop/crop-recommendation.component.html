@@ -1,0 +1,187 @@
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-4">
+                <h2 class="display-5 fw-bold text-success mb-3">🌱 Crop Recommendations</h2>
+                <p class="lead text-muted">Get AI-powered crop suggestions based on soil and climate</p>
+            </div>
+
+            <!-- Alert Messages -->
+            <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+            <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+            <!-- Main Card -->
+            <div class="card shadow border-0">
+                <div class="card-body p-5">
+                    <form [formGroup]="recommendationForm" (ngSubmit)="getRecommendation()">
+
+                        <h4 class="text-success mb-4">Soil & Climate Data</h4>
+
+                        <!-- Mode Selector -->
+                        <div class="mb-4 p-3 bg-light rounded">
+                            <div class="d-flex gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="mode" id="modeBasic"
+                                        value="BASIC" [(ngModel)]="mode" [ngModelOptions]="{standalone: true}"
+                                        (change)="onModeChange()">
+                                    <label class="form-check-label fw-bold" for="modeBasic">
+                                        🌾 Basic Mode
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="mode" id="modeAdvanced"
+                                        value="ADVANCED" [(ngModel)]="mode" [ngModelOptions]="{standalone: true}"
+                                        (change)="onModeChange()">
+                                    <label class="form-check-label fw-bold" for="modeAdvanced">
+                                        🧪 Soil Health Card
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Basic Mode Fields -->
+                        <div *ngIf="mode === 'BASIC'" class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Soil Type *</label>
+                                <select class="form-select" formControlName="soilType">
+                                    <option value="">Select...</option>
+                                    <option *ngFor="let soil of soilTypes" [value]="soil.toLowerCase()">{{ soil }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Season *</label>
+                                <select class="form-select" formControlName="season">
+                                    <option value="">Select...</option>
+                                    <option value="monsoon">Monsoon/Kharif</option>
+                                    <option value="winter">Winter/Rabi</option>
+                                    <option value="summer">Summer/Zaid</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Location</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" formControlName="location"
+                                        placeholder="e.g. Hyderabad">
+                                    <button type="button" class="btn btn-outline-success" (click)="useCurrentLocation()"
+                                        [disabled]="loadingLocation">
+                                        📍
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Temperature (°C)</label>
+                                <input type="number" class="form-control" formControlName="temperature"
+                                    placeholder="e.g. 26">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Humidity (%)</label>
+                                <input type="number" class="form-control" formControlName="humidity"
+                                    placeholder="e.g. 80">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Rainfall (mm)</label>
+                                <input type="number" class="form-control" formControlName="rainfall"
+                                    placeholder="e.g. 200">
+                            </div>
+                        </div>
+
+                        <!-- Advanced Mode Fields -->
+                        <div *ngIf="mode === 'ADVANCED'" formGroupName="soilHealthData">
+                            <h6 class="text-secondary mb-3">Soil Health Card Parameters</h6>
+
+                            <!-- Required NPK Parameters -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">pH Level *</label>
+                                    <input type="number" class="form-control" formControlName="pH" step="0.1" min="4"
+                                        max="9" placeholder="e.g. 6.5">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Nitrogen (N) kg/ha *</label>
+                                    <input type="number" class="form-control" formControlName="nitrogen"
+                                        placeholder="e.g. 280">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Phosphorus (P) kg/ha *</label>
+                                    <input type="number" class="form-control" formControlName="phosphorus"
+                                        placeholder="e.g. 40">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Potassium (K) kg/ha *</label>
+                                    <input type="number" class="form-control" formControlName="potassium"
+                                        placeholder="e.g. 200">
+                                </div>
+                            </div>
+
+                            <!-- Optional SHC Parameters -->
+                            <h6 class="text-secondary mb-3 mt-4">Additional Parameters (Optional)</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Organic Carbon (%)</label>
+                                    <input type="number" class="form-control" formControlName="organicCarbon" step="0.1"
+                                        min="0" max="10" placeholder="e.g. 0.5">
+                                    <small class="text-muted">Range: 0-10%</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Electrical Conductivity (dS/m)</label>
+                                    <input type="number" class="form-control" formControlName="electricalConductivity"
+                                        step="0.1" min="0" placeholder="e.g. 0.3">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Temperature (°C)</label>
+                                    <input type="number" class="form-control" formControlName="temperature"
+                                        placeholder="e.g. 26">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Rainfall (mm)</label>
+                                    <input type="number" class="form-control" formControlName="rainfall"
+                                        placeholder="e.g. 200">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Humidity (%)</label>
+                                    <input type="number" class="form-control" formControlName="humidity" min="0"
+                                        max="100" placeholder="e.g. 80">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-success btn-lg px-5" [disabled]="loading">
+                                <span *ngIf="!loading">Get Recommendations</span>
+                                <span *ngIf="loading">Processing...</span>
+                            </button>
+                        </div>
+
+                    </form>
+
+                    <!-- Results Section -->
+                    <div *ngIf="recommendations && recommendations.length > 0" class="mt-5 pt-4 border-top">
+                        <h4 class="text-center text-success mb-4">
+                            ✅ Recommended Crops
+                        </h4>
+                        <p class="text-center text-muted mb-4">{{message}}</p>
+
+                        <div class="row g-3">
+                            <div class="col-md-6" *ngFor="let crop of recommendations; let i = index">
+                                <div class="card h-100" [class.border-success]="i === 0">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <h5 class="card-title text-success mb-0">{{crop.name}}</h5>
+                                            <span class="badge bg-success">{{crop.suitabilityScore}}%</span>
+                                        </div>
+                                        <p class="card-text small text-muted mt-2">{{crop.description}}</p>
+                                        <div class="small">
+                                            <div><strong>Yield:</strong> {{crop.yieldInfo}}</div>
+                                            <div><strong>Soil:</strong> {{crop.suitableSoil}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,96 @@
+/* Progress Bar */
+.progress-container {
+    margin: 2rem 0;
+}
+
+/* Step Indicators */
+.step-indicators {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+}
+
+.step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+}
+
+.step-number {
+    display: inline-block;
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #999;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s;
+}
+
+.step.active .step-number {
+    background: #28a745;
+    color: white;
+}
+
+.step.completed .step-number {
+    background: #1e7e34;
+    color: white;
+}
+
+.step-label {
+    display: block;
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.step.active .step-label {
+    color: #333;
+    font-weight: 600;
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Card Styling */
+.card.border-success {
+    border-width: 2px !important;
+}
+
+/* Form Check */
+.form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .step-indicators {
+        gap: 0.5rem;
+    }
+
+    .step-label {
+        font-size: 0.75rem;
+    }
+
+    .step-number {
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+    }
+}

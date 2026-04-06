@@ -1,0 +1,151 @@
+<div class="survey-list-container">
+    <div class="page-header">
+        <h2>My Crop Surveys</h2>
+        <button class="btn btn-primary" (click)="createNewSurvey()">
+            + Create New Survey
+        </button>
+    </div>
+
+    <!-- Alert Messages -->
+    <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="alert alert-success">
+        {{ successMessage }}
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <div class="filter-group">
+            <label>Search:</label>
+            <input type="text" [(ngModel)]="searchText" (input)="applyFilters()" class="filter-input"
+                placeholder="Search by crop, location...">
+        </div>
+
+        <div class="filter-group">
+            <label>Status:</label>
+            <select [(ngModel)]="filterStatus" (change)="applyFilters()" class="filter-select">
+                <option value="all">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Crop:</label>
+            <select [(ngModel)]="filterCrop" (change)="applyFilters()" class="filter-select">
+                <option value="all">All Crops</option>
+                <option *ngFor="let crop of getUniqueCropTypes()" [value]="crop">{{ crop }}</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading surveys...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && filteredSurveys.length === 0" class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>No Surveys Found</h3>
+        <p *ngIf="searchText || filterStatus !== 'all' || filterCrop !== 'all'">
+            Try adjusting your filters
+        </p>
+        <p *ngIf="!searchText && filterStatus === 'all' && filterCrop === 'all'">
+            You haven't created any surveys yet. Create your first survey to get started!
+        </p>
+        <button class="btn btn-primary" (click)="createNewSurvey()">
+            Create First Survey
+        </button>
+    </div>
+
+    <!-- Survey Cards -->
+    <div *ngIf="!loading && filteredSurveys.length > 0" class="surveys-grid">
+        <div *ngFor="let survey of getPaginatedSurveys()" class="survey-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <h3>{{ survey.cropType }}</h3>
+                    <span class="badge" [ngClass]="getStatusClass(survey.status)">
+                        {{ survey.status }}
+                    </span>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-icon" (click)="editSurvey(survey.id!)" title="Edit">
+                        ✏️
+                    </button>
+                    <button class="btn-icon" (click)="deleteSurvey(survey.id!)" title="Delete">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="info-row">
+                    <span class="label">Location:</span>
+                    <span class="value">{{ survey.location.city }}, {{ survey.location.state }}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Farm Size:</span>
+                    <span class="value">{{ survey.farmSize }} {{ survey.farmSizeUnit }}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Season:</span>
+                    <span class="value">{{ survey.season }}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Planting Date:</span>
+                    <span class="value">{{ formatDate(survey.plantingDate) }}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Machinery Needed:</span>
+                    <span class="value">
+                        <span *ngFor="let m of survey.machineryNeeded; let last = last" class="machinery-tag">
+                            {{ m.machineType }}<span *ngIf="!last">, </span>
+                        </span>
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Contact:</span>
+                    <span class="value">{{ survey.farmerPhone }}</span>
+                </div>
+
+                <div *ngIf="survey.additionalNotes" class="info-row">
+                    <span class="label">Notes:</span>
+                    <span class="value">{{ survey.additionalNotes }}</span>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <small class="text-muted">Created: {{ formatDate(survey.createdAt!) }}</small>
+
+                <div class="status-actions" *ngIf="survey.status === 'Active'">
+                    <button class="btn btn-sm btn-success" (click)="updateStatus(survey.id!, 'Completed')">
+                        Mark Completed
+                    </button>
+                    <button class="btn btn-sm btn-danger" (click)="updateStatus(survey.id!, 'Cancelled')">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="totalPages > 1" class="pagination">
+        <button class="btn btn-secondary" (click)="previousPage()" [disabled]="currentPage === 1">
+            Previous
+        </button>
+        <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+        <button class="btn btn-secondary" (click)="nextPage()" [disabled]="currentPage === totalPages">
+            Next
+        </button>
+    </div>
+</div>

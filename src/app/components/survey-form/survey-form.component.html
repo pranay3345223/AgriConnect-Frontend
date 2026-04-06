@@ -1,0 +1,223 @@
+<div class="survey-container">
+    <div class="survey-header">
+        <h2>🌾 Crop Survey Form</h2>
+        <p>Help us understand your farming needs and connect you with the right resources</p>
+    </div>
+
+    <!-- Alert Messages -->
+    <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="alert alert-success">
+        {{ successMessage }}
+    </div>
+
+    <form [formGroup]="surveyForm" (ngSubmit)="onSubmit()">
+
+        <!-- Section 1: Farm Information -->
+        <div class="form-section">
+            <h3>📍 Section 1: Farm Information</h3>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="farmerName">Farmer's Full Name *</label>
+                    <input type="text" id="farmerName" formControlName="farmerName" class="form-control"
+                        placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="farmerPhone">Mobile Phone Number *</label>
+                    <input type="tel" id="farmerPhone" formControlName="farmerPhone" class="form-control"
+                        placeholder="10-digit number">
+                    <small class="form-text">Must be a valid 10-digit number</small>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="village">Village/Locality Name</label>
+                    <input type="text" id="village" formControlName="village" class="form-control"
+                        placeholder="Enter village name">
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label>Farm GPS Location</label>
+                    <button type="button" class="btn btn-gps" (click)="useCurrentLocation()"
+                        [disabled]="loadingLocation">
+                        <span *ngIf="!loadingLocation">📍 Capture GPS Location</span>
+                        <span *ngIf="loadingLocation">📍 Getting location...</span>
+                    </button>
+                    <small class="form-text">Automatically record coordinates when at the farm</small>
+                </div>
+            </div>
+
+            <div formGroupName="location" class="location-details">
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label for="address">Farm Address *</label>
+                        <input type="text" id="address" formControlName="address" class="form-control"
+                            placeholder="Village/Town, Landmark">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="city">City/District *</label>
+                        <input type="text" id="city" formControlName="city" class="form-control">
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <label for="state">State *</label>
+                        <input type="text" id="state" formControlName="state" class="form-control">
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <label for="pincode">Pincode *</label>
+                        <input type="text" id="pincode" formControlName="pincode" class="form-control"
+                            placeholder="6-digit">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-8">
+                    <label for="farmSize">Total Farm Area *</label>
+                    <input type="number" id="farmSize" formControlName="farmSize" class="form-control"
+                        placeholder="10.5" step="0.1">
+                </div>
+
+                <div class="form-group col-md-4">
+                    <label for="farmSizeUnit">Unit *</label>
+                    <select id="farmSizeUnit" formControlName="farmSizeUnit" class="form-control">
+                        <option *ngFor="let unit of farmSizeUnits" [value]="unit">{{ unit }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Current Crop Details -->
+        <div class="form-section">
+            <h3>🌱 Section 2: Current Crop Details ("What's Growing Now")</h3>
+            <p class="section-hint">Add all crops currently in your field</p>
+
+            <div formArrayName="currentCrops">
+                <div *ngFor="let crop of currentCrops.controls; let i = index" [formGroupName]="i" class="crop-item">
+
+                    <div class="crop-header">
+                        <h4>Crop {{ i + 1 }}</h4>
+                        <button type="button" class="btn btn-danger btn-sm" (click)="removeCurrentCrop(i)"
+                            *ngIf="currentCrops.length > 1">
+                            Remove
+                        </button>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Crop Name *</label>
+                            <select formControlName="cropName" class="form-control">
+                                <option value="">Select crop</option>
+                                <option *ngFor="let crop of cropTypes" [value]="crop">{{ crop }}</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label>Crop Variety (Optional)</label>
+                            <input type="text" formControlName="cropVariety" class="form-control"
+                                placeholder="e.g., Basmati 370, Hybrid 5">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label>Planted Area *</label>
+                            <input type="number" formControlName="plantedArea" class="form-control" placeholder="Area"
+                                step="0.1">
+                            <small class="form-text">Must be ≤ Total Farm Area</small>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label>Sowing/Planting Date *</label>
+                            <input type="date" formControlName="sowingDate" class="form-control">
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label>Current Crop Stage</label>
+                            <select formControlName="cropStage" class="form-control">
+                                <option value="">Select stage</option>
+                                <option *ngFor="let stage of cropStages" [value]="stage">{{ stage }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-add-crop" (click)="addCurrentCrop()">
+                + Add Another Crop
+            </button>
+        </div>
+
+        <!-- Section 3: Future Crop Plan -->
+        <div class="form-section">
+            <h3>📅 Section 3: Future Crop Plan ("Next Season")</h3>
+
+            <div class="form-group">
+                <label class="toggle-label">
+                    <input type="checkbox" formControlName="planningNextCrop">
+                    <span>Do you plan to plant a new crop after the current harvest?</span>
+                </label>
+            </div>
+
+            <div *ngIf="surveyForm.get('planningNextCrop')?.value" class="future-plan-details">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>What is the next crop you plan to plant? *</label>
+                        <select formControlName="nextCropType" class="form-control">
+                            <option value="">Select crop</option>
+                            <option *ngFor="let crop of cropTypes" [value]="crop">{{ crop }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label>Planned Area for Next Crop *</label>
+                        <input type="number" formControlName="nextCropPlannedArea" class="form-control"
+                            placeholder="Area in acres/hectares" step="0.1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Planned Sowing/Planting Month *</label>
+                    <select formControlName="nextCropPlantingMonth" class="form-control">
+                        <option value="">Select month</option>
+                        <option *ngFor="let month of months" [value]="month">{{ month }}</option>
+                    </select>
+                    <small class="form-text">Select the expected month for planting (e.g., January 2026)</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Feedback & Completion -->
+        <div class="form-section">
+            <h3>💬 Section 4: Feedback & Completion</h3>
+
+            <div class="form-group">
+                <label for="additionalNotes">Any comments or specific help you need for this crop/next crop?</label>
+                <textarea id="additionalNotes" formControlName="additionalNotes" class="form-control" rows="4"
+                    placeholder="e.g., Need advice on pest control for cotton"></textarea>
+            </div>
+
+            <div class="submission-info">
+                <p><strong>Data Collection Date:</strong> {{ currentDate | date:'medium' }}</p>
+
+                <small>The exact date and time will be automatically recorded when you submit</small>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-submit" [disabled]="isSubmitting || surveyForm.invalid">
+                <span *ngIf="!isSubmitting">📋 Submit Survey</span>
+                <span *ngIf="isSubmitting">⏳ Submitting...</span>
+            </button>
+        </div>
+    </form>
+</div>

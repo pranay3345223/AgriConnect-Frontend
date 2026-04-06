@@ -37,6 +37,7 @@ import { AuthService } from '../../services/auth.service';
               </button>
             </div>
           }
+          
         </div>
       </div>
 
@@ -217,6 +218,32 @@ import { AuthService } from '../../services/auth.service';
     .icon {
       font-size: 1.25rem;
     }
+
+    .survey-cta {
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .btn-survey {
+      background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+      font-size: 1.2rem;
+      padding: 1.2rem 3rem;
+    }
+
+    .btn-survey:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+    }
+
+    .survey-hint {
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+      opacity: 0.9;
+      color: white;
+    }
+
 
     .features-section {
       padding: 5rem 0;

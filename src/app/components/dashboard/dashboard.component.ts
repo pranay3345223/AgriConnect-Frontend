@@ -80,10 +80,16 @@ import { User } from '../../models/user.model';
               </a>
             }
 
-            <a routerLink="/crop-recommendation" class="action-card">
-              <div class="action-icon">🌾</div>
-              <h3>Crop Recommendations</h3>
-              <p>Get AI-powered crop suggestions</p>
+            <a routerLink="/surveys/new" class="action-card">
+              <div class="action-icon">📋</div>
+              <h3>Crop Survey</h3>
+              <p>Share your farming details with us</p>
+            </a>
+
+            <a routerLink="/chat" class="action-card">
+              <div class="action-icon">💬</div>
+              <h3>Global Chat</h3>
+              <p>Connect with the farming community</p>
             </a>
 
             <a routerLink="/profile" class="action-card">

@@ -11,7 +11,7 @@ import { Machine } from '../../../models/machine.model';
   template: `
     <div class="detail-container" *ngIf="machine">
       <div class="glass-panel detail-card">
-        <div class="image-section" [style.background-image]="'url(' + (machine.imageUrl || 'assets/images/placeholder-machine.jpg') + ')'">
+        <div class="image-section" [style.background-image]="'url(' + getImageUrl(machine.imageUrl) + ')'">
           <button class="btn-back" routerLink="/machines"> Back</button>
         </div>
 
@@ -214,5 +214,11 @@ export class MachineDetailComponent implements OnInit {
     if (id) {
       this.machineService.getMachineById(id).subscribe(m => this.machine = m);
     }
+  }
+
+  getImageUrl(path?: string): string {
+    if (!path) return 'assets/images/placeholder-machine.jpg';
+    if (path.startsWith('http')) return path;
+    return `http://localhost:8080${path}`;
   }
 }

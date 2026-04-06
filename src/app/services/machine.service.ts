@@ -44,8 +44,28 @@ export class MachineService {
     /**
      * Create new machine
      */
-    createMachine(machine: Machine): Observable<Machine> {
-        return this.http.post<Machine>(this.apiUrl, machine);
+    createMachine(machine: Machine, image?: File): Observable<Machine> {
+        const formData = new FormData();
+        
+        // Map Angular model properties to Spring Boot DTO properties
+        formData.append('name', machine.name || '');
+        formData.append('machineType', machine.category || 'Other');
+        formData.append('description', machine.description || '');
+        formData.append('location', machine.location || '');
+        formData.append('pricePerDay', (machine.pricePerDay || 0).toString());
+        formData.append('ownerName', machine.ownerName || 'Unknown');
+        formData.append('ownerContact', machine.ownerPhone || '0000000000');
+        formData.append('available', String(machine.available !== false));
+        
+        // Default coordinates required by backend validation
+        formData.append('latitude', '0.0');
+        formData.append('longitude', '0.0');
+        
+        if (image) {
+            formData.append('image', image);
+        }
+        
+        return this.http.post<Machine>(this.apiUrl, formData);
     }
 
     /**

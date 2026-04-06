@@ -50,6 +50,29 @@ export const routes: Routes = [
         loadComponent: () => import('./components/community/community.component').then(m => m.CommunityComponent)
     },
     {
+        path: 'surveys',
+        canActivate: [authGuard],
+        children: [
+            {
+                path: '',
+                redirectTo: 'my-surveys',
+                pathMatch: 'full'
+            },
+            {
+                path: 'new',
+                loadComponent: () => import('./components/survey-form/survey-form.component').then(m => m.SurveyFormComponent)
+            },
+            {
+                path: 'my-surveys',
+                loadComponent: () => import('./components/survey-list/survey-list.component').then(m => m.SurveyListComponent)
+            },
+            {
+                path: 'edit/:id',
+                loadComponent: () => import('./components/survey-form/survey-form.component').then(m => m.SurveyFormComponent)
+            }
+        ]
+    },
+    {
         path: 'machines',
         children: [
             {
@@ -66,6 +89,11 @@ export const routes: Routes = [
                 loadComponent: () => import('./components/machines/machine-detail/machine-detail.component').then(m => m.MachineDetailComponent)
             }
         ]
+    },
+    {
+        path: 'chat',
+        canActivate: [authGuard],
+        loadComponent: () => import('./components/chat/chat.component').then(m => m.ChatComponent)
     },
     {
         path: '**',
